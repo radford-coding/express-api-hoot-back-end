@@ -10,7 +10,7 @@ router.post('/', verifyToken, async (req, res) => {
         const hoot = await Hoot.create(req.body);
         hoot._doc.author = req.user;
         res.status(201).json(hoot);
-    } catch (error) {
+    } catch (err) {
         res.status(500).json({ err: err.message });
     };
 });
@@ -22,7 +22,7 @@ router.get('/', verifyToken, async (req, res) => {
             .populate('author')
             .sort({ createdAt: 'desc' });
         res.status(200).json(hoots);
-    } catch (error) {
+    } catch (err) {
         res.status(500).json({ err: err.message });
     };
 });
@@ -32,9 +32,23 @@ router.get('/:hootId', verifyToken, async (req, res) => {
     try {
         const foundHoot = await Hoot.findById(req.params.hootId).populate('author');
         res.status(200).json(foundHoot);
-    } catch (error) {
+    } catch (err) {
         res.status(500).json({ err: err.message });
     };
+});
+
+// PUT /hoots/:hootId
+router.put('/:hootId', verifyToken, async (req, res) => {
+    try {
+        const foundHoot = await Hoot.findById(req.params.hootId);
+        if (!foundHoot.author.equals(req.user._id)) return res.status(403).send('you\'re not allowed to do that!');
+
+        const updatedHoot = await Hoot.findByIdAndUpdate(req.params.hootId, req.body, { new: true });
+        updatedHoot._doc.author = req.user;
+        res.status(200).json(updatedHoot);
+    } catch (err) {
+        res.status(500).json({ err: err.message });
+    }
 });
 
 module.exports = router;
