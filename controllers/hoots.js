@@ -42,13 +42,26 @@ router.put('/:hootId', verifyToken, async (req, res) => {
     try {
         const foundHoot = await Hoot.findById(req.params.hootId);
         if (!foundHoot.author.equals(req.user._id)) return res.status(403).send('you\'re not allowed to do that!');
-
+        
         const updatedHoot = await Hoot.findByIdAndUpdate(req.params.hootId, req.body, { new: true });
         updatedHoot._doc.author = req.user;
         res.status(200).json(updatedHoot);
     } catch (err) {
         res.status(500).json({ err: err.message });
-    }
+    };
+});
+
+// DELETE /hoots/:hootId
+router.delete('/:hootId', verifyToken, async (req, res) => {
+    try {
+        const foundHoot = await Hoot.findById(req.params.hootId);
+        if (!foundHoot.author.equals(req.user._id)) return res.status(403).send('you\'re not allowed to do that!');
+        
+        const deletedHoot = await Hoot.findByIdAndDelete(req.params.hootId);
+        res.status(200).json(deletedHoot);
+    } catch (err) {
+        res.status(500).json({ err: err.message });
+    };
 });
 
 module.exports = router;
