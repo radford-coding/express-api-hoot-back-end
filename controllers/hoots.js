@@ -12,7 +12,7 @@ router.post('/', verifyToken, async (req, res) => {
         res.status(201).json(hoot);
     } catch (error) {
         res.status(500).json({ err: err.message });
-    }
+    };
 });
 
 // GET /hoots
@@ -24,7 +24,17 @@ router.get('/', verifyToken, async (req, res) => {
         res.status(200).json(hoots);
     } catch (error) {
         res.status(500).json({ err: err.message });
-    }
+    };
+});
+
+// GET /hoots/:hootId
+router.get('/:hootId', verifyToken, async (req, res) => {
+    try {
+        const foundHoot = await Hoot.findById(req.params.hootId).populate('author');
+        res.status(200).json(foundHoot);
+    } catch (error) {
+        res.status(500).json({ err: err.message });
+    };
 });
 
 module.exports = router;
