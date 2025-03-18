@@ -34,8 +34,8 @@ router.get('/', verifyToken, async (req, res) => {
 router.get('/:hootId', verifyToken, async (req, res) => {
     try {
         const foundHoot = await Hoot.findById(req.params.hootId).populate(
-            'author',
-            'comments.author',
+            ['author',
+            'comments.author',]
         );
         res.status(200).json(foundHoot);
     } catch (err) {
